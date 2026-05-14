@@ -1,0 +1,49 @@
+name: urban_intelligence
+version: "1.0.0"
+config-version: 2
+
+profile: urban_intelligence
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+vars:
+  bronze_schema: bronze
+  silver_schema: silver
+  gold_schema: gold
+  data_start_date: "2020-01-01"
+
+models:
+  urban_intelligence:
+    staging:
+      +materialized: view
+      +schema: staging
+      +tags: ["staging"]
+    intermediate:
+      +materialized: table
+      +schema: silver
+      +tags: ["silver", "intermediate"]
+    marts:
+      +materialized: table
+      +schema: gold
+      +tags: ["gold", "marts"]
+      facts:
+        +materialized: incremental
+        +unique_key: surrogate_key
+      dimensions:
+        +materialized: table
+
+on-run-start:
+  - "CREATE SCHEMA IF NOT EXISTS bronze"
+  - "CREATE SCHEMA IF NOT EXISTS silver"
+  - "CREATE SCHEMA IF NOT EXISTS gold"
+  - "CREATE SCHEMA IF NOT EXISTS staging"

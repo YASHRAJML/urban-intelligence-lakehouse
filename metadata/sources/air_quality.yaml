@@ -1,0 +1,72 @@
+source_id: air_quality
+source_name: "Urban Air Quality Index Dataset"
+description: "Hourly air quality measurements from urban monitoring stations"
+owner: "data-engineering-team"
+tags: ["air-quality", "environment", "batch", "csv"]
+
+# ─── Source Configuration ───
+source_type: kaggle
+format: csv
+enabled: true
+
+kaggle:
+  dataset: "rohanrao/air-quality-data-in-india"
+  filename: "city_hour.csv"
+  download_path: "/opt/airflow/data/raw/air_quality"
+
+# ─── Target Configuration ───
+target:
+  layer: bronze
+  table: bronze_air_quality
+  database_path: "/opt/airflow/data/duckdb/urban_intelligence.duckdb"
+  partition_by: "ingestion_date"
+
+# ─── Schedule ───
+schedule:
+  type: cron
+  expression: "0 3 * * *"
+  catchup: false
+  retries: 3
+  retry_delay_minutes: 5
+
+# ─── Schema Mapping ───
+schema_mapping:
+  City: {target: city, type: varchar, required: true}
+  Datetime: {target: measurement_timestamp, type: timestamp, required: true}
+  PM2.5: {target: pm25, type: double, required: false, validation: {min: 0, max: 2000}}
+  PM10: {target: pm10, type: double, required: false, validation: {min: 0, max: 3000}}
+  NO: {target: nitric_oxide, type: double, required: false}
+  NO2: {target: nitrogen_dioxide, type: double, required: false}
+  NOx: {target: nox, type: double, required: false}
+  NH3: {target: ammonia, type: double, required: false}
+  CO: {target: carbon_monoxide, type: double, required: false}
+  SO2: {target: sulfur_dioxide, type: double, required: false}
+  O3: {target: ozone, type: double, required: false}
+  Benzene: {target: benzene, type: double, required: false}
+  Toluene: {target: toluene, type: double, required: false}
+  Xylene: {target: xylene, type: double, required: false}
+  AQI: {target: aqi, type: double, required: false, validation: {min: 0, max: 1000}}
+  AQI_Bucket: {target: aqi_category, type: varchar, required: false}
+
+# ─── Data Quality Rules ───
+quality_checks:
+  - check_type: not_null
+    columns: [city, measurement_timestamp]
+  - check_type: value_range
+    column: aqi
+    min: 0
+    max: 1000
+  - check_type: accepted_values
+    column: aqi_category
+    values: ["Good", "Satisfactory", "Moderate", "Poor", "Very Poor", "Severe"]
+  - check_type: freshness
+    column: measurement_timestamp
+    max_age_hours: 72
+
+# ─── Additional Metadata ───
+metadata:
+  data_classification: public
+  pii_contains: false
+  update_frequency: daily
+  expected_row_count_min: 5000
+  expected_row_count_max: 1000000

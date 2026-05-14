@@ -1,0 +1,306 @@
+version: "3.9"
+
+# ──────────────────────────────────────────────
+# Unified Real-Time Data Lakehouse for Urban Intelligence
+# ──────────────────────────────────────────────
+
+x-airflow-common: &airflow-common
+  image: apache/airflow:2.9.1-python3.11
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: "46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLt1nmkFes="
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+    AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
+    AIRFLOW__WEBSERVER__SECRET_KEY: "urban-intelligence-secret-key-2024"
+    PYTHONPATH: "/opt/airflow/ingestion_engine:/opt/airflow/plugins"
+    # Kafka
+    KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+    # DuckDB
+    DUCKDB_PATH: "/opt/airflow/data/duckdb/urban_intelligence.duckdb"
+    # Data paths
+    DATA_BASE_PATH: "/opt/airflow/data"
+    BRONZE_PATH: "/opt/airflow/data/bronze"
+    SILVER_PATH: "/opt/airflow/data/silver"
+    GOLD_PATH: "/opt/airflow/data/gold"
+    RAW_PATH: "/opt/airflow/data/raw"
+    METADATA_PATH: "/opt/airflow/metadata"
+    DBT_PROJECT_DIR: "/opt/airflow/dbt_project"
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/logs:/opt/airflow/logs
+    - ./airflow/plugins:/opt/airflow/plugins
+    - ./airflow/config:/opt/airflow/config
+    - ./ingestion_engine:/opt/airflow/ingestion_engine
+    - ./dbt_project:/opt/airflow/dbt_project
+    - ./metadata:/opt/airflow/metadata
+    - ./data:/opt/airflow/data
+    - ./quality:/opt/airflow/quality
+    - ./scripts:/opt/airflow/scripts
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on:
+    postgres:
+      condition: service_healthy
+  networks:
+    - lakehouse_net
+
+services:
+  # ─── POSTGRES (Airflow metadata DB) ───
+  postgres:
+    image: postgres:15
+    container_name: lakehouse_postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    networks:
+      - lakehouse_net
+
+  # ─── AIRFLOW INIT ───
+  airflow-init:
+    <<: *airflow-common
+    container_name: lakehouse_airflow_init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -p /opt/airflow/logs /opt/airflow/dags /opt/airflow/plugins
+        chown -R "${AIRFLOW_UID:-50000}:0" /opt/airflow/{logs,dags,plugins,data}
+        airflow db migrate
+        airflow users create \
+          --username admin \
+          --firstname Admin \
+          --lastname User \
+          --role Admin \
+          --email admin@urbanintelligence.local \
+          --password admin
+        pip install --quiet --no-cache-dir \
+          duckdb==0.10.3 \
+          kafka-python==2.0.2 \
+          dbt-duckdb==1.8.1 \
+          pandas==2.2.2 \
+          pyarrow==16.1.0 \
+          pyyaml==6.0.1 \
+          requests==2.32.3 \
+          great-expectations==0.18.19 \
+          tenacity==8.3.0 \
+          faker==25.2.0 \
+          python-dotenv==1.0.1
+        echo "Airflow initialized successfully!"
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_MIGRATE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+    user: "0:0"
+
+  # ─── AIRFLOW WEBSERVER ───
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: lakehouse_airflow_webserver
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  # ─── AIRFLOW SCHEDULER ───
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: lakehouse_airflow_scheduler
+    command: scheduler
+    healthcheck:
+      test: ["CMD", "airflow", "jobs", "check", "--job-type", "SchedulerJob", "--hostname", "$${HOSTNAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  # ─── AIRFLOW TRIGGERER ───
+  airflow-triggerer:
+    <<: *airflow-common
+    container_name: lakehouse_airflow_triggerer
+    command: triggerer
+    restart: unless-stopped
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  # ─── ZOOKEEPER ───
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: lakehouse_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: WARN
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_log:/var/lib/zookeeper/log
+    networks:
+      - lakehouse_net
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── KAFKA ───
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: lakehouse_kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 24
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - lakehouse_net
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # ─── KAFKA PRODUCER (Urban Events Simulator) ───
+  kafka-producer:
+    build:
+      context: ./kafka/producer
+      dockerfile: Dockerfile
+    container_name: lakehouse_kafka_producer
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:29092"
+      PRODUCE_INTERVAL_MS: "500"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - lakehouse_net
+
+  # ─── KAFKA CONSUMER ───
+  kafka-consumer:
+    build:
+      context: ./kafka/consumer
+      dockerfile: Dockerfile
+    container_name: lakehouse_kafka_consumer
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:29092"
+      DUCKDB_PATH: "/data/duckdb/urban_intelligence.duckdb"
+      BRONZE_PATH: "/data/bronze"
+    volumes:
+      - ./data:/data
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - lakehouse_net
+
+  # ─── METABASE ───
+  metabase:
+    image: metabase/metabase:v0.49.6
+    container_name: lakehouse_metabase
+    ports:
+      - "3000:3000"
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: airflow
+      MB_DB_PASS: airflow
+      MB_DB_HOST: postgres
+      MB_SITE_NAME: "Urban Intelligence Lakehouse"
+      JAVA_OPTS: "-Xmx512m"
+    depends_on:
+      - postgres
+      - metabase-init-db
+    volumes:
+      - metabase_data:/metabase-data
+      - ./data/duckdb:/duckdb-data:ro
+    networks:
+      - lakehouse_net
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "-I", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  # ─── METABASE DB INIT ───
+  metabase-init-db:
+    image: postgres:15
+    container_name: lakehouse_metabase_init
+    environment:
+      PGPASSWORD: airflow
+    command: >
+      bash -c "psql -h postgres -U airflow -c 'CREATE DATABASE metabase;' || true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - lakehouse_net
+
+  # ─── KAFKA UI (optional monitoring) ───
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: lakehouse_kafka_ui
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local-urban-kafka
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - lakehouse_net
+
+volumes:
+  postgres_data:
+  zookeeper_data:
+  zookeeper_log:
+  kafka_data:
+  metabase_data:
+
+networks:
+  lakehouse_net:
+    driver: bridge

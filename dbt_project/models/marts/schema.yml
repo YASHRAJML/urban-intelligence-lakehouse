@@ -1,0 +1,54 @@
+-- models/marts/schema.yml
+-- dbt schema tests for mart models
+
+version: 2
+
+models:
+  - name: fact_traffic_hourly
+    description: "Hourly aggregated traffic volume fact table (Gold layer)"
+    columns:
+      - name: hour_key
+        description: "Truncated hour timestamp (primary grain)"
+        tests:
+          - not_null
+          - unique
+      - name: avg_traffic_volume
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100000
+      - name: traffic_level
+        tests:
+          - accepted_values:
+              values: ["Low", "Medium", "High", "Very High"]
+
+  - name: fact_air_quality_daily
+    description: "Daily air quality metrics per city (Gold layer)"
+    columns:
+      - name: city
+        tests:
+          - not_null
+      - name: date_key
+        tests:
+          - not_null
+      - name: avg_aqi
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1000
+
+  - name: dim_date
+    description: "Complete date dimension from 2020-2026"
+    columns:
+      - name: date_key
+        tests:
+          - not_null
+          - unique
+      - name: year
+        tests:
+          - not_null
+      - name: season
+        tests:
+          - accepted_values:
+              values: ["Winter", "Spring", "Summer", "Autumn"]

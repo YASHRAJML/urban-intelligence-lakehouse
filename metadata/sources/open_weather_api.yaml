@@ -1,0 +1,88 @@
+source_id: open_weather_api
+source_name: "OpenWeatherMap Current Weather API"
+description: "Real-time weather data from OpenWeatherMap free tier API for major cities"
+owner: "data-engineering-team"
+tags: ["weather", "api", "real-time", "json"]
+
+# ─── Source Configuration ───
+source_type: api
+format: json
+enabled: true
+
+api:
+  base_url: "https://api.openweathermap.org/data/2.5"
+  endpoint: "/weather"
+  method: GET
+  auth_type: api_key
+  auth_param: appid
+  # Use the free Open-Meteo API (no key needed) as fallback:
+  fallback_url: "https://api.open-meteo.com/v1/forecast"
+  timeout_seconds: 30
+  pagination: false
+  rate_limit_per_minute: 60
+
+  # Cities to fetch (will loop through each)
+  params_template:
+    units: metric
+    appid: "${OPENWEATHER_API_KEY}"
+
+  city_list:
+    - {name: "New York", lat: 40.7128, lon: -74.0060}
+    - {name: "London", lat: 51.5074, lon: -0.1278}
+    - {name: "Tokyo", lat: 35.6762, lon: 139.6503}
+    - {name: "Mumbai", lat: 19.0760, lon: 72.8777}
+    - {name: "Berlin", lat: 52.5200, lon: 13.4050}
+    - {name: "Sydney", lat: -33.8688, lon: 151.2093}
+    - {name: "Dubai", lat: 25.2048, lon: 55.2708}
+    - {name: "Singapore", lat: 1.3521, lon: 103.8198}
+
+# ─── Target Configuration ───
+target:
+  layer: bronze
+  table: bronze_weather_api
+  database_path: "/opt/airflow/data/duckdb/urban_intelligence.duckdb"
+
+# ─── Schedule ───
+schedule:
+  type: cron
+  expression: "*/15 * * * *"   # every 15 minutes
+  catchup: false
+  retries: 3
+  retry_delay_minutes: 2
+
+# ─── Response Mapping (JSONPath) ───
+schema_mapping:
+  "$.name": {target: city_name, type: varchar, required: true}
+  "$.coord.lat": {target: latitude, type: double, required: true}
+  "$.coord.lon": {target: longitude, type: double, required: true}
+  "$.main.temp": {target: temperature_celsius, type: double, required: true}
+  "$.main.feels_like": {target: feels_like_celsius, type: double, required: false}
+  "$.main.humidity": {target: humidity_pct, type: integer, required: false}
+  "$.main.pressure": {target: pressure_hpa, type: integer, required: false}
+  "$.wind.speed": {target: wind_speed_ms, type: double, required: false}
+  "$.wind.deg": {target: wind_direction_deg, type: integer, required: false}
+  "$.weather[0].main": {target: weather_condition, type: varchar, required: false}
+  "$.weather[0].description": {target: weather_description, type: varchar, required: false}
+  "$.visibility": {target: visibility_meters, type: integer, required: false}
+  "$.dt": {target: observation_timestamp, type: bigint, required: true}
+
+# ─── Data Quality Rules ───
+quality_checks:
+  - check_type: not_null
+    columns: [city_name, observation_timestamp]
+  - check_type: value_range
+    column: humidity_pct
+    min: 0
+    max: 100
+  - check_type: value_range
+    column: temperature_celsius
+    min: -90
+    max: 60
+  - check_type: freshness
+    column: observation_timestamp
+    max_age_hours: 2
+
+metadata:
+  data_classification: public
+  pii_contains: false
+  update_frequency: 15min

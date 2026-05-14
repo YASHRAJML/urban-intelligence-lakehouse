@@ -1,0 +1,14 @@
+urban_intelligence:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', '/opt/airflow/data/duckdb/urban_intelligence.duckdb') }}"
+      threads: 4
+      extensions:
+        - httpfs
+        - parquet
+    prod:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', '/opt/airflow/data/duckdb/urban_intelligence.duckdb') }}"
+      threads: 8

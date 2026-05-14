@@ -1,0 +1,74 @@
+source_id: public_transit_api
+source_name: "Open Transit API - City Bus & Train Data"
+description: "Public transit GTFS-RT data from open transit feeds (no auth required)"
+owner: "data-engineering-team"
+tags: ["transit", "api", "json", "gtfs"]
+
+# ─── Source Configuration ───
+source_type: api
+format: json
+enabled: true
+
+api:
+  base_url: "https://transit.land/api/v2"
+  endpoint: "/routes"
+  method: GET
+  auth_type: api_key
+  auth_header: "apikey"
+  fallback_enabled: true
+  timeout_seconds: 30
+  pagination: true
+  pagination_strategy: offset
+  page_size: 100
+  max_pages: 10
+  rate_limit_per_minute: 30
+
+  params_template:
+    per_page: 100
+    apikey: "${TRANSITLAND_API_KEY}"
+
+  # Operators to query
+  operator_list:
+    - {onestop_id: "o-9q9-bart", name: "Bay Area Rapid Transit"}
+    - {onestop_id: "o-dp3wj-londonunderground", name: "London Underground"}
+    - {onestop_id: "o-u33d-tokyometro", name: "Tokyo Metro"}
+
+# ─── Target Configuration ───
+target:
+  layer: bronze
+  table: bronze_transit_routes
+  database_path: "/opt/airflow/data/duckdb/urban_intelligence.duckdb"
+
+# ─── Schedule ───
+schedule:
+  type: cron
+  expression: "0 */6 * * *"   # every 6 hours
+  catchup: false
+  retries: 2
+  retry_delay_minutes: 5
+
+# ─── Response Mapping ───
+schema_mapping:
+  "$.id": {target: route_id, type: varchar, required: true}
+  "$.onestop_id": {target: onestop_id, type: varchar, required: false}
+  "$.name": {target: route_name, type: varchar, required: false}
+  "$.route_long_name": {target: route_long_name, type: varchar, required: false}
+  "$.route_type": {target: route_type_code, type: integer, required: false}
+  "$.route_color": {target: route_color_hex, type: varchar, required: false}
+  "$.route_url": {target: route_url, type: varchar, required: false}
+  "$.operated_by_name": {target: operator_name, type: varchar, required: false}
+  "$.geometry.type": {target: geometry_type, type: varchar, required: false}
+
+# ─── Data Quality Rules ───
+quality_checks:
+  - check_type: not_null
+    columns: [route_id]
+  - check_type: unique
+    columns: [route_id]
+  - check_type: not_null
+    columns: [route_name]
+
+metadata:
+  data_classification: public
+  pii_contains: false
+  update_frequency: 6h

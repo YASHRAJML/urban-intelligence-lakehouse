@@ -1,0 +1,84 @@
+source_id: urban_events_kafka
+source_name: "Urban IoT Events Stream"
+description: "Real-time sensor events: clicks, orders, pedestrian counts, vehicle detections"
+owner: "data-engineering-team"
+tags: ["streaming", "kafka", "iot", "real-time", "json"]
+
+# ─── Source Configuration ───
+source_type: kafka
+format: json
+enabled: true
+
+kafka:
+  bootstrap_servers: "kafka:29092"
+  topics:
+    - name: urban.traffic.events
+      description: "Vehicle detection events from road sensors"
+      partitions: 3
+      replication_factor: 1
+    - name: urban.pedestrian.events
+      description: "Pedestrian counting sensor events"
+      partitions: 2
+      replication_factor: 1
+    - name: urban.air.events
+      description: "Air quality sensor readings"
+      partitions: 2
+      replication_factor: 1
+    - name: urban.orders.events
+      description: "Urban delivery and order events"
+      partitions: 3
+      replication_factor: 1
+  consumer_group: urban-intelligence-consumer
+  auto_offset_reset: earliest
+  max_poll_records: 500
+  session_timeout_ms: 30000
+  heartbeat_interval_ms: 10000
+
+# ─── Target Configuration ───
+target:
+  layer: bronze
+  table: bronze_urban_stream_events
+  database_path: "/opt/airflow/data/duckdb/urban_intelligence.duckdb"
+  write_mode: append
+  batch_size: 100
+  flush_interval_seconds: 30
+
+# ─── Trigger ───
+schedule:
+  type: continuous
+  trigger: kafka
+  catchup: false
+  retries: 5
+  retry_delay_minutes: 1
+
+# ─── Message Schema Mapping ───
+schema_mapping:
+  event_id: {target: event_id, type: varchar, required: true}
+  event_type: {target: event_type, type: varchar, required: true}
+  sensor_id: {target: sensor_id, type: varchar, required: true}
+  location_id: {target: location_id, type: varchar, required: false}
+  latitude: {target: latitude, type: double, required: false}
+  longitude: {target: longitude, type: double, required: false}
+  timestamp: {target: event_timestamp, type: timestamp, required: true}
+  value: {target: metric_value, type: double, required: false}
+  unit: {target: metric_unit, type: varchar, required: false}
+  topic: {target: kafka_topic, type: varchar, required: true}
+  partition: {target: kafka_partition, type: integer, required: false}
+  offset: {target: kafka_offset, type: bigint, required: false}
+  payload: {target: raw_payload, type: json, required: false}
+
+# ─── Data Quality Rules ───
+quality_checks:
+  - check_type: not_null
+    columns: [event_id, event_type, event_timestamp]
+  - check_type: unique
+    columns: [event_id]
+  - check_type: freshness
+    column: event_timestamp
+    max_age_hours: 1
+
+metadata:
+  data_classification: internal
+  pii_contains: false
+  update_frequency: streaming
+  expected_throughput_per_second: 100

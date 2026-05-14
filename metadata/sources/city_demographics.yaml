@@ -1,0 +1,64 @@
+source_id: city_demographics
+source_name: "City Demographics CSV Files"
+description: "Local CSV files with city population and demographics data"
+owner: "data-engineering-team"
+tags: ["demographics", "file", "csv", "batch"]
+
+# ─── Source Configuration ───
+source_type: file
+format: csv
+enabled: true
+
+file:
+  base_path: "/opt/airflow/data/raw/demographics"
+  pattern: "city_demographics_*.csv"
+  recursive: false
+  encoding: utf-8
+  delimiter: ","
+  has_header: true
+  skip_rows: 0
+  quote_char: '"'
+
+# ─── Target Configuration ───
+target:
+  layer: bronze
+  table: bronze_city_demographics
+  database_path: "/opt/airflow/data/duckdb/urban_intelligence.duckdb"
+  write_mode: overwrite
+
+# ─── Schedule ───
+schedule:
+  type: cron
+  expression: "0 4 * * 1"   # weekly on Monday at 4 AM
+  catchup: false
+  retries: 2
+  retry_delay_minutes: 5
+
+# ─── Schema Mapping ───
+schema_mapping:
+  City: {target: city_name, type: varchar, required: true}
+  State: {target: state_name, type: varchar, required: false}
+  "Median Age": {target: median_age, type: double, required: false}
+  "Male Population": {target: male_population, type: bigint, required: false}
+  "Female Population": {target: female_population, type: bigint, required: false}
+  "Total Population": {target: total_population, type: bigint, required: false, validation: {min: 0}}
+  "Number of Veterans": {target: veteran_count, type: bigint, required: false}
+  "Foreign-born": {target: foreign_born_count, type: bigint, required: false}
+  "Average Household Size": {target: avg_household_size, type: double, required: false}
+  "State Code": {target: state_code, type: varchar, required: false}
+  Race: {target: race, type: varchar, required: false}
+  Count: {target: race_count, type: bigint, required: false}
+
+# ─── Data Quality Rules ───
+quality_checks:
+  - check_type: not_null
+    columns: [city_name]
+  - check_type: value_range
+    column: total_population
+    min: 0
+    max: 50000000
+
+metadata:
+  data_classification: public
+  pii_contains: false
+  update_frequency: weekly

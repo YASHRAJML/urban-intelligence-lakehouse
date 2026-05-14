@@ -1,0 +1,79 @@
+-- models/staging/sources.yml
+-- dbt source definitions for bronze layer tables
+
+version: 2
+
+sources:
+  - name: bronze
+    description: "Raw bronze layer — ingested as-is from all source types"
+    schema: bronze
+    tables:
+      - name: bronze_urban_traffic
+        description: "Raw urban traffic volume from Kaggle dataset"
+        columns:
+          - name: event_timestamp
+            description: "Timestamp of traffic measurement"
+            tests:
+              - not_null
+          - name: traffic_volume
+            description: "Number of vehicles per hour"
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+                  max_value: 100000
+
+      - name: bronze_air_quality
+        description: "Raw air quality measurements from Kaggle dataset"
+        columns:
+          - name: city
+            tests:
+              - not_null
+          - name: measurement_timestamp
+            tests:
+              - not_null
+          - name: aqi
+            tests:
+              - dbt_utils.accepted_range:
+                  min_value: 0
+                  max_value: 1000
+
+      - name: bronze_weather_api
+        description: "Raw weather data from REST API"
+        columns:
+          - name: city_name
+            tests:
+              - not_null
+          - name: observation_timestamp
+            tests:
+              - not_null
+
+      - name: bronze_urban_stream_events
+        description: "Raw Kafka streaming IoT events"
+        columns:
+          - name: event_id
+            tests:
+              - not_null
+              - unique
+          - name: event_type
+            tests:
+              - not_null
+          - name: event_timestamp
+            tests:
+              - not_null
+
+      - name: bronze_city_demographics
+        description: "City demographics from CSV file source"
+        columns:
+          - name: city_name
+            tests:
+              - not_null
+
+  - name: silver
+    description: "Cleaned and standardized silver layer"
+    schema: silver
+    tables:
+      - name: silver_traffic
+      - name: silver_air_quality
+      - name: silver_weather
+      - name: silver_stream_events
