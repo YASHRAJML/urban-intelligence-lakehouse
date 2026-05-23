@@ -7,29 +7,37 @@ Run this before docker-compose up to pre-populate raw data.
 from __future__ import annotations
 
 import csv
+import math
 import json
 import os
 import random
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-import numpy as np
-
 BASE_DIR = Path(__file__).parent.parent
 DATA_DIR = BASE_DIR / "data"
+
+
+def _gauss(mu: float, sigma: float) -> float:
+    return random.gauss(mu, sigma)
+
+
+def _exponential(scale: float) -> float:
+    """Exponential distribution via inverse CDF (mean = scale)."""
+    return random.expovariate(1.0 / scale)
 
 
 def make_dirs():
     for d in ["raw/traffic", "raw/air_quality", "raw/demographics", "bronze", "silver", "gold", "duckdb"]:
         (DATA_DIR / d).mkdir(parents=True, exist_ok=True)
-    print("✅ Data directories created")
+    print("[OK] Data directories created")
 
 
 def generate_traffic_csv():
     """Generate Metro Interstate Traffic Volume CSV."""
     path = DATA_DIR / "raw" / "traffic" / "Metro_Interstate_Traffic_Volume.csv"
     if path.exists():
-        print(f"⏭  Traffic CSV already exists: {path}")
+        print(f"[SKIP] Traffic CSV already exists: {path}")
         return
 
     weather_conditions = ["Clear", "Clouds", "Rain", "Snow", "Mist", "Drizzle"]
@@ -45,13 +53,13 @@ def generate_traffic_csv():
         w = random.choice(weather_conditions)
         hour = dt.hour
         base = 3000
-        traffic = max(0, int(base + np.sin(np.pi * hour / 12) * 1500 + random.gauss(0, 300)))
+        traffic = max(0, int(base + math.sin(math.pi * hour / 12) * 1500 + _gauss(0, 300)))
         rows.append({
             "date_time": dt.strftime("%Y-%m-%d %H:%M:%S"),
             "holiday": "None" if random.random() > 0.03 else "Columbus Day",
             "temp": round(random.uniform(250, 310), 2),
-            "rain_1h": round(random.exponential(2) if w == "Rain" else 0, 2),
-            "snow_1h": round(random.exponential(1) if w == "Snow" else 0, 2),
+            "rain_1h": round(_exponential(2) if w == "Rain" else 0, 2),
+            "snow_1h": round(_exponential(1) if w == "Snow" else 0, 2),
             "clouds_all": random.randint(0, 100),
             "weather_main": w,
             "weather_description": weather_desc[w],
@@ -62,14 +70,14 @@ def generate_traffic_csv():
         writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         writer.writeheader()
         writer.writerows(rows)
-    print(f"✅ Traffic CSV: {len(rows)} rows → {path}")
+    print(f"[OK] Traffic CSV: {len(rows)} rows -> {path}")
 
 
 def generate_air_quality_csv():
     """Generate city-hour air quality CSV."""
     path = DATA_DIR / "raw" / "air_quality" / "city_hour.csv"
     if path.exists():
-        print(f"⏭  Air quality CSV already exists: {path}")
+        print(f"[SKIP] Air quality CSV already exists: {path}")
         return
 
     cities = ["Mumbai", "Delhi", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Pune", "Ahmedabad"]
@@ -112,14 +120,14 @@ def generate_air_quality_csv():
         writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         writer.writeheader()
         writer.writerows(rows)
-    print(f"✅ Air quality CSV: {len(rows)} rows → {path}")
+    print(f"[OK] Air quality CSV: {len(rows)} rows -> {path}")
 
 
 def generate_demographics_csv():
     """Generate US cities demographics CSV."""
     path = DATA_DIR / "raw" / "demographics" / "city_demographics_2023.csv"
     if path.exists():
-        print(f"⏭  Demographics CSV already exists: {path}")
+        print(f"[SKIP] Demographics CSV already exists: {path}")
         return
 
     cities = [
@@ -156,15 +164,14 @@ def generate_demographics_csv():
         writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         writer.writeheader()
         writer.writerows(rows)
-    print(f"✅ Demographics CSV: {len(rows)} rows → {path}")
+    print(f"[OK] Demographics CSV: {len(rows)} rows -> {path}")
 
 
 if __name__ == "__main__":
-    np.random.seed(42)
     random.seed(42)
     make_dirs()
     generate_traffic_csv()
     generate_air_quality_csv()
     generate_demographics_csv()
-    print("\n🎉 All sample datasets generated successfully!")
-    print(f"📁 Data directory: {DATA_DIR}")
+    print("\n[DONE] All sample datasets generated successfully!")
+    print(f"[DIR] Data directory: {DATA_DIR}")
