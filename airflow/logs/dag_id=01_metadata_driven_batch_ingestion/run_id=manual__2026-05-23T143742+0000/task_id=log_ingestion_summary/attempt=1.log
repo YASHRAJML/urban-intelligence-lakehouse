@@ -1,0 +1,28 @@
+[2026-05-23T14:46:07.523+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-05-23T14:46:07.583+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 01_metadata_driven_batch_ingestion.log_ingestion_summary manual__2026-05-23T14:37:42+00:00 [queued]>
+[2026-05-23T14:46:07.594+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 01_metadata_driven_batch_ingestion.log_ingestion_summary manual__2026-05-23T14:37:42+00:00 [queued]>
+[2026-05-23T14:46:07.595+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 4
+[2026-05-23T14:46:07.613+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): log_ingestion_summary> on 2026-05-23 14:37:42+00:00
+[2026-05-23T14:46:07.621+0000] {standard_task_runner.py:63} INFO - Started process 6261 to run task
+[2026-05-23T14:46:07.625+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', '01_metadata_driven_batch_ingestion', 'log_ingestion_summary', 'manual__2026-05-23T14:37:42+00:00', '--job-id', '44', '--raw', '--subdir', 'DAGS_FOLDER/dag_01_batch_ingestion.py', '--cfg-path', '/tmp/tmpa4fhm5xn']
+[2026-05-23T14:46:07.628+0000] {standard_task_runner.py:91} INFO - Job 44: Subtask log_ingestion_summary
+[2026-05-23T14:46:07.700+0000] {task_command.py:426} INFO - Running <TaskInstance: 01_metadata_driven_batch_ingestion.log_ingestion_summary manual__2026-05-23T14:37:42+00:00 [running]> on host 8ea7e69b3fbf
+[2026-05-23T14:46:07.792+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data-engineering' AIRFLOW_CTX_DAG_ID='01_metadata_driven_batch_ingestion' AIRFLOW_CTX_TASK_ID='log_ingestion_summary' AIRFLOW_CTX_EXECUTION_DATE='2026-05-23T14:37:42+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-05-23T14:37:42+00:00'
+[2026-05-23T14:46:07.793+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-05-23T14:46:07.841+0000] {logging_mixin.py:188} INFO - 
+╔══════════════════════════════════════════════════════════╗
+║          BATCH INGESTION SUMMARY                         ║
+╠══════════════════════════════════════════════════════════╣
+║  Total Sources  : 5                                       ║
+║  Successful     : 3                                       ║
+║  Failed         : 2                                       ║
+║  Total Rows     : 10158                                   ║
+╚══════════════════════════════════════════════════════════╝
+    
+[2026-05-23T14:46:07.841+0000] {logging_mixin.py:188} INFO - FAILED SOURCES: ['air_quality', 'city_demographics']
+[2026-05-23T14:46:07.842+0000] {python.py:237} INFO - Done. Returned value was: None
+[2026-05-23T14:46:07.842+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-05-23T14:46:07.855+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=01_metadata_driven_batch_ingestion, task_id=log_ingestion_summary, run_id=manual__2026-05-23T14:37:42+00:00, execution_date=20260523T143742, start_date=20260523T144607, end_date=20260523T144607
+[2026-05-23T14:46:07.879+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 0
+[2026-05-23T14:46:07.899+0000] {taskinstance.py:3498} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-05-23T14:46:07.901+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

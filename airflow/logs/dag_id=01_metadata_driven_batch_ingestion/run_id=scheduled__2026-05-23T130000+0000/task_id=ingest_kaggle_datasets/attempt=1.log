@@ -1,0 +1,92 @@
+[2026-05-23T14:23:34.721+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-05-23T14:23:34.857+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 01_metadata_driven_batch_ingestion.ingest_kaggle_datasets scheduled__2026-05-23T13:00:00+00:00 [queued]>
+[2026-05-23T14:23:34.893+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 01_metadata_driven_batch_ingestion.ingest_kaggle_datasets scheduled__2026-05-23T13:00:00+00:00 [queued]>
+[2026-05-23T14:23:34.899+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 4
+[2026-05-23T14:23:34.965+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): ingest_kaggle_datasets> on 2026-05-23 13:00:00+00:00
+[2026-05-23T14:23:34.990+0000] {standard_task_runner.py:63} INFO - Started process 228 to run task
+[2026-05-23T14:23:35.023+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', '01_metadata_driven_batch_ingestion', 'ingest_kaggle_datasets', 'scheduled__2026-05-23T13:00:00+00:00', '--job-id', '7', '--raw', '--subdir', 'DAGS_FOLDER/dag_01_batch_ingestion.py', '--cfg-path', '/tmp/tmp28cu_693']
+[2026-05-23T14:23:35.063+0000] {standard_task_runner.py:91} INFO - Job 7: Subtask ingest_kaggle_datasets
+[2026-05-23T14:23:35.380+0000] {task_command.py:426} INFO - Running <TaskInstance: 01_metadata_driven_batch_ingestion.ingest_kaggle_datasets scheduled__2026-05-23T13:00:00+00:00 [running]> on host 8ea7e69b3fbf
+[2026-05-23T14:23:35.773+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data-engineering' AIRFLOW_CTX_DAG_ID='01_metadata_driven_batch_ingestion' AIRFLOW_CTX_TASK_ID='ingest_kaggle_datasets' AIRFLOW_CTX_EXECUTION_DATE='2026-05-23T13:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-05-23T13:00:00+00:00'
+[2026-05-23T14:23:35.777+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-05-23T14:26:17.582+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.engine | Loaded source config: air_quality from air_quality.yaml
+[2026-05-23T14:26:17.592+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.engine | Loaded source config: city_demographics from city_demographics.yaml
+[2026-05-23T14:26:17.604+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.engine | Loaded source config: open_weather_api from open_weather_api.yaml
+[2026-05-23T14:26:17.613+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.engine | Loaded source config: public_transit_api from public_transit_api.yaml
+[2026-05-23T14:26:17.623+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.engine | Loaded source config: urban_events_kafka from urban_events_kafka.yaml
+[2026-05-23T14:26:17.631+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.engine | Loaded source config: urban_traffic from urban_traffic.yaml
+[2026-05-23T14:26:17.632+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.engine | Loaded 6 enabled source configurations
+[2026-05-23T14:26:17.632+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.engine | Starting ingestion | source_id=air_quality | type=kaggle | handler=KaggleIngestionSource
+[2026-05-23T14:26:17.669+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.utils.db_manager | DuckDB schemas initialized: bronze, silver, gold, staging
+[2026-05-23T14:26:17.670+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.utils.db_manager | DuckDBManager initialized: /opt/***/data/duckdb/urban_intelligence.duckdb
+[2026-05-23T14:26:17.670+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.sources.base_source | [air_quality] ── EXTRACT ──
+[2026-05-23T14:26:17.674+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.sources.kaggle_source | [air_quality] Using cached file: /opt/***/data/raw/air_quality/city_hour.csv
+[2026-05-23T14:26:17.884+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.sources.base_source | [air_quality] Extracted 70080 rows
+[2026-05-23T14:26:17.884+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.sources.base_source | [air_quality] ── TRANSFORM ──
+[2026-05-23T14:26:17.898+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | ERROR    | ingestion_engine.sources.base_source | [air_quality] Ingestion error: 'bool' object has no attribute 'startswith'
+Traceback (most recent call last):
+  File "/opt/***/ingestion_engine/sources/base_source.py", line 98, in ingest
+    df_transformed = self.transform(df_raw)
+                     ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/***/ingestion_engine/sources/base_source.py", line 49, in transform
+    df = self.schema_mapper.apply(df)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/***/ingestion_engine/utils/schema_mapper.py", line 58, in apply
+    elif src_col.startswith("$."):
+         ^^^^^^^^^^^^^^^^^^
+AttributeError: 'bool' object has no attribute 'startswith'
+[2026-05-23T14:26:17.941+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.utils.db_manager | Wrote 1 rows to bronze.ingestion_audit (mode=append)
+[2026-05-23T14:26:17.970+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | ERROR    | ingestion_engine.engine | Ingestion failed for air_quality: 'bool' object has no attribute 'startswith'
+Traceback (most recent call last):
+  File "/opt/***/ingestion_engine/engine.py", line 125, in run_by_type
+    result = self._execute_ingestion(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/***/ingestion_engine/engine.py", line 177, in _execute_ingestion
+    result = handler.ingest()
+             ^^^^^^^^^^^^^^^^
+  File "/opt/***/ingestion_engine/sources/base_source.py", line 98, in ingest
+    df_transformed = self.transform(df_raw)
+                     ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/***/ingestion_engine/sources/base_source.py", line 49, in transform
+    df = self.schema_mapper.apply(df)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/***/ingestion_engine/utils/schema_mapper.py", line 58, in apply
+    elif src_col.startswith("$."):
+         ^^^^^^^^^^^^^^^^^^
+AttributeError: 'bool' object has no attribute 'startswith'
+[2026-05-23T14:26:17.973+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.engine | Starting ingestion | source_id=urban_traffic | type=kaggle | handler=KaggleIngestionSource
+[2026-05-23T14:26:17.973+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.sources.base_source | [urban_traffic] ── EXTRACT ──
+[2026-05-23T14:26:17.978+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:17 | INFO     | ingestion_engine.sources.kaggle_source | [urban_traffic] Using cached file: /opt/***/data/raw/traffic/Metro_Interstate_Traffic_Volume.csv
+[2026-05-23T14:26:18.011+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:18 | INFO     | ingestion_engine.sources.base_source | [urban_traffic] Extracted 10000 rows
+[2026-05-23T14:26:18.012+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:18 | INFO     | ingestion_engine.sources.base_source | [urban_traffic] ── TRANSFORM ──
+[2026-05-23T14:26:18.026+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:18 | INFO     | ingestion_engine.sources.base_source | [urban_traffic] ── LOAD ──
+[2026-05-23T14:26:18.108+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:18 | INFO     | ingestion_engine.utils.db_manager | Wrote 10000 rows to bronze.bronze_urban_traffic (mode=append)
+[2026-05-23T14:26:18.145+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:18 | INFO     | ingestion_engine.sources.base_source | [urban_traffic] Loaded 10000 rows into bronze_urban_traffic
+[2026-05-23T14:26:18.188+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:18 | INFO     | ingestion_engine.utils.db_manager | Wrote 1 rows to bronze.ingestion_audit (mode=append)
+[2026-05-23T14:26:18.217+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:18 | INFO     | ingestion_engine.engine | Completed ingestion | source_id=urban_traffic | status=success | rows=10000
+[2026-05-23T14:26:18.234+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-05-23T14:26:18.235+0000] {taskinstance.py:2905} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 465, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 432, in _execute_callable
+    return execute_callable(context=context, **execute_callable_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/baseoperator.py", line 400, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/operators/python.py", line 235, in execute
+    return_value = self.execute_callable()
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/operators/python.py", line 252, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/airflow/dags/dag_01_batch_ingestion.py", line 63, in ingest_kaggle_sources
+    raise RuntimeError(f"Kaggle ingestion failures: {[r['source_id'] for r in failed]}")
+RuntimeError: Kaggle ingestion failures: ['air_quality']
+[2026-05-23T14:26:18.249+0000] {taskinstance.py:1206} INFO - Marking task as UP_FOR_RETRY. dag_id=01_metadata_driven_batch_ingestion, task_id=ingest_kaggle_datasets, run_id=scheduled__2026-05-23T13:00:00+00:00, execution_date=20260523T130000, start_date=20260523T142334, end_date=20260523T142618
+[2026-05-23T14:26:18.263+0000] {standard_task_runner.py:110} ERROR - Failed to execute job 7 for task ingest_kaggle_datasets (Kaggle ingestion failures: ['air_quality']; 228)
+[2026-05-23T14:26:18.302+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 1
+[2026-05-23T14:26:18.338+0000] {taskinstance.py:3498} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-05-23T14:26:18.340+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

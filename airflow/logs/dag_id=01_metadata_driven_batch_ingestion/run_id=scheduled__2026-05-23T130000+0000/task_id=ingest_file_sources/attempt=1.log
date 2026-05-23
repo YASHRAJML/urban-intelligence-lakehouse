@@ -1,0 +1,38 @@
+[2026-05-23T14:23:34.742+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-05-23T14:23:34.855+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 01_metadata_driven_batch_ingestion.ingest_file_sources scheduled__2026-05-23T13:00:00+00:00 [queued]>
+[2026-05-23T14:23:34.888+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 01_metadata_driven_batch_ingestion.ingest_file_sources scheduled__2026-05-23T13:00:00+00:00 [queued]>
+[2026-05-23T14:23:34.889+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 4
+[2026-05-23T14:23:34.969+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): ingest_file_sources> on 2026-05-23 13:00:00+00:00
+[2026-05-23T14:23:34.987+0000] {standard_task_runner.py:63} INFO - Started process 227 to run task
+[2026-05-23T14:23:34.996+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', '01_metadata_driven_batch_ingestion', 'ingest_file_sources', 'scheduled__2026-05-23T13:00:00+00:00', '--job-id', '11', '--raw', '--subdir', 'DAGS_FOLDER/dag_01_batch_ingestion.py', '--cfg-path', '/tmp/tmptnd2hayo']
+[2026-05-23T14:23:35.002+0000] {standard_task_runner.py:91} INFO - Job 11: Subtask ingest_file_sources
+[2026-05-23T14:23:35.307+0000] {task_command.py:426} INFO - Running <TaskInstance: 01_metadata_driven_batch_ingestion.ingest_file_sources scheduled__2026-05-23T13:00:00+00:00 [running]> on host 8ea7e69b3fbf
+[2026-05-23T14:23:35.661+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data-engineering' AIRFLOW_CTX_DAG_ID='01_metadata_driven_batch_ingestion' AIRFLOW_CTX_TASK_ID='ingest_file_sources' AIRFLOW_CTX_EXECUTION_DATE='2026-05-23T13:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-05-23T13:00:00+00:00'
+[2026-05-23T14:23:35.662+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-05-23T14:26:20.569+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.engine | Loaded source config: air_quality from air_quality.yaml
+[2026-05-23T14:26:20.577+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.engine | Loaded source config: city_demographics from city_demographics.yaml
+[2026-05-23T14:26:20.588+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.engine | Loaded source config: open_weather_api from open_weather_api.yaml
+[2026-05-23T14:26:20.597+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.engine | Loaded source config: public_transit_api from public_transit_api.yaml
+[2026-05-23T14:26:20.606+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.engine | Loaded source config: urban_events_kafka from urban_events_kafka.yaml
+[2026-05-23T14:26:20.615+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.engine | Loaded source config: urban_traffic from urban_traffic.yaml
+[2026-05-23T14:26:20.616+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.engine | Loaded 6 enabled source configurations
+[2026-05-23T14:26:20.616+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.engine | Starting ingestion | source_id=city_demographics | type=file | handler=FileIngestionSource
+[2026-05-23T14:26:20.655+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.utils.db_manager | DuckDB schemas initialized: bronze, silver, gold, staging
+[2026-05-23T14:26:20.656+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.utils.db_manager | DuckDBManager initialized: /opt/***/data/duckdb/urban_intelligence.duckdb
+[2026-05-23T14:26:20.656+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.sources.base_source | [city_demographics] ── EXTRACT ──
+[2026-05-23T14:26:20.663+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.sources.file_source | [city_demographics] Discovered 1 files in /opt/***/data/raw/demographics
+[2026-05-23T14:26:20.684+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.sources.file_source | [city_demographics] Read 50 rows from city_demographics_2023.csv
+[2026-05-23T14:26:20.684+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.sources.file_source | [city_demographics] Combined 1 files → 50 total rows
+[2026-05-23T14:26:20.685+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.sources.base_source | [city_demographics] Extracted 50 rows
+[2026-05-23T14:26:20.685+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.sources.base_source | [city_demographics] ── TRANSFORM ──
+[2026-05-23T14:26:20.692+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.sources.base_source | [city_demographics] ── LOAD ──
+[2026-05-23T14:26:20.738+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.utils.db_manager | Wrote 50 rows to bronze.bronze_city_demographics (mode=overwrite)
+[2026-05-23T14:26:20.765+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.sources.base_source | [city_demographics] Loaded 50 rows into bronze_city_demographics
+[2026-05-23T14:26:20.810+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.utils.db_manager | Wrote 1 rows to bronze.ingestion_audit (mode=append)
+[2026-05-23T14:26:20.842+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:26:20 | INFO     | ingestion_engine.engine | Completed ingestion | source_id=city_demographics | status=success | rows=50
+[2026-05-23T14:26:20.859+0000] {python.py:237} INFO - Done. Returned value was: {'ingested': 1, 'results': [{'source_id': 'city_demographics', 'source_type': 'file', 'status': 'success', 'rows_extracted': 50, 'rows_written': 50, 'errors': [], 'started_at': '2026-05-23T14:26:20.656577+00:00', 'duration_seconds': 0.11, 'finished_at': '2026-05-23T14:26:20.766661+00:00'}]}
+[2026-05-23T14:26:20.860+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-05-23T14:26:20.888+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=01_metadata_driven_batch_ingestion, task_id=ingest_file_sources, run_id=scheduled__2026-05-23T13:00:00+00:00, execution_date=20260523T130000, start_date=20260523T142334, end_date=20260523T142620
+[2026-05-23T14:26:20.946+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 0
+[2026-05-23T14:26:20.971+0000] {taskinstance.py:3498} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-05-23T14:26:20.974+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

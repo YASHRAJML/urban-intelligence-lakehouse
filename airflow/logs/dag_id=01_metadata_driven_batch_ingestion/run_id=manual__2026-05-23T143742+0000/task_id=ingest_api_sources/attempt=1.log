@@ -1,0 +1,49 @@
+[2026-05-23T14:37:44.419+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-05-23T14:37:44.454+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 01_metadata_driven_batch_ingestion.ingest_api_sources manual__2026-05-23T14:37:42+00:00 [queued]>
+[2026-05-23T14:37:44.461+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 01_metadata_driven_batch_ingestion.ingest_api_sources manual__2026-05-23T14:37:42+00:00 [queued]>
+[2026-05-23T14:37:44.461+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 4
+[2026-05-23T14:37:44.472+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): ingest_api_sources> on 2026-05-23 14:37:42+00:00
+[2026-05-23T14:37:44.478+0000] {standard_task_runner.py:63} INFO - Started process 3977 to run task
+[2026-05-23T14:37:44.481+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', '01_metadata_driven_batch_ingestion', 'ingest_api_sources', 'manual__2026-05-23T14:37:42+00:00', '--job-id', '32', '--raw', '--subdir', 'DAGS_FOLDER/dag_01_batch_ingestion.py', '--cfg-path', '/tmp/tmpx3ppt2x6']
+[2026-05-23T14:37:44.484+0000] {standard_task_runner.py:91} INFO - Job 32: Subtask ingest_api_sources
+[2026-05-23T14:37:44.549+0000] {task_command.py:426} INFO - Running <TaskInstance: 01_metadata_driven_batch_ingestion.ingest_api_sources manual__2026-05-23T14:37:42+00:00 [running]> on host 8ea7e69b3fbf
+[2026-05-23T14:37:44.627+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data-engineering' AIRFLOW_CTX_DAG_ID='01_metadata_driven_batch_ingestion' AIRFLOW_CTX_TASK_ID='ingest_api_sources' AIRFLOW_CTX_EXECUTION_DATE='2026-05-23T14:37:42+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-05-23T14:37:42+00:00'
+[2026-05-23T14:37:44.629+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-05-23T14:38:19.521+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: air_quality from air_quality.yaml
+[2026-05-23T14:38:19.528+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: city_demographics from city_demographics.yaml
+[2026-05-23T14:38:19.539+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: open_weather_api from open_weather_api.yaml
+[2026-05-23T14:38:19.547+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: public_transit_api from public_transit_api.yaml
+[2026-05-23T14:38:19.556+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: urban_events_kafka from urban_events_kafka.yaml
+[2026-05-23T14:38:19.563+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: urban_traffic from urban_traffic.yaml
+[2026-05-23T14:38:19.563+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded 6 enabled source configurations
+[2026-05-23T14:38:19.564+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Starting ingestion | source_id=open_weather_api | type=api | handler=APIIngestionSource
+[2026-05-23T14:38:19.600+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.utils.db_manager | DuckDB schemas initialized: bronze, silver, gold, staging
+[2026-05-23T14:38:19.600+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.utils.db_manager | DuckDBManager initialized: /opt/***/data/duckdb/urban_intelligence.duckdb
+[2026-05-23T14:38:19.601+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.sources.base_source | [open_weather_api] ── EXTRACT ──
+[2026-05-23T14:38:19.834+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | WARNING  | ingestion_engine.sources.api_source | [open_weather_api] API request failed: 401 Client Error: Unauthorized for url: https://api.openweathermap.org/data/2.5/weather?units=metric&appid=&lat=40.7128&lon=-74.006 — falling back to synthetic data
+[2026-05-23T14:38:19.920+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.sources.api_source | [open_weather_api] Generating synthetic API data
+[2026-05-23T14:38:19.922+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.sources.base_source | [open_weather_api] Extracted 8 rows
+[2026-05-23T14:38:19.923+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.sources.base_source | [open_weather_api] ── TRANSFORM ──
+[2026-05-23T14:38:19.928+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.sources.base_source | [open_weather_api] ── LOAD ──
+[2026-05-23T14:38:19.971+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.utils.db_manager | Wrote 8 rows to bronze.bronze_weather_api (mode=append)
+[2026-05-23T14:38:19.999+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.sources.base_source | [open_weather_api] Loaded 8 rows into bronze_weather_api
+[2026-05-23T14:38:20.038+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:20 | INFO     | ingestion_engine.utils.db_manager | Wrote 1 rows to bronze.ingestion_audit (mode=append)
+[2026-05-23T14:38:20.060+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:20 | INFO     | ingestion_engine.engine | Completed ingestion | source_id=open_weather_api | status=success | rows=8
+[2026-05-23T14:38:20.061+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:20 | INFO     | ingestion_engine.engine | Starting ingestion | source_id=public_transit_api | type=api | handler=APIIngestionSource
+[2026-05-23T14:38:20.061+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:20 | INFO     | ingestion_engine.sources.base_source | [public_transit_api] ── EXTRACT ──
+[2026-05-23T14:38:21.282+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:21 | WARNING  | ingestion_engine.sources.api_source | [public_transit_api] Page 1 failed: 403 Client Error: Forbidden for url: https://www.transit.land/api/v2/routes?per_page=100&apikey=&page=1
+[2026-05-23T14:38:21.285+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:21 | WARNING  | ingestion_engine.sources.api_source | [public_transit_api] Empty API response — using synthetic data
+[2026-05-23T14:38:21.304+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:21 | INFO     | ingestion_engine.sources.api_source | [public_transit_api] Generating synthetic API data
+[2026-05-23T14:38:21.306+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:21 | INFO     | ingestion_engine.sources.base_source | [public_transit_api] Extracted 150 rows
+[2026-05-23T14:38:21.307+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:21 | INFO     | ingestion_engine.sources.base_source | [public_transit_api] ── TRANSFORM ──
+[2026-05-23T14:38:21.310+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:21 | INFO     | ingestion_engine.sources.base_source | [public_transit_api] ── LOAD ──
+[2026-05-23T14:38:21.350+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:21 | INFO     | ingestion_engine.utils.db_manager | Wrote 150 rows to bronze.bronze_transit_routes (mode=append)
+[2026-05-23T14:38:21.378+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:21 | INFO     | ingestion_engine.sources.base_source | [public_transit_api] Loaded 150 rows into bronze_transit_routes
+[2026-05-23T14:38:21.415+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:21 | INFO     | ingestion_engine.utils.db_manager | Wrote 1 rows to bronze.ingestion_audit (mode=append)
+[2026-05-23T14:38:21.439+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:21 | INFO     | ingestion_engine.engine | Completed ingestion | source_id=public_transit_api | status=success | rows=150
+[2026-05-23T14:38:21.452+0000] {python.py:237} INFO - Done. Returned value was: {'ingested': 2, 'results': [{'source_id': 'open_weather_api', 'source_type': 'api', 'status': 'success', 'rows_extracted': 8, 'rows_written': 8, 'errors': [], 'started_at': '2026-05-23T14:38:19.601432+00:00', 'duration_seconds': 0.4, 'finished_at': '2026-05-23T14:38:20.000549+00:00'}, {'source_id': 'public_transit_api', 'source_type': 'api', 'status': 'success', 'rows_extracted': 150, 'rows_written': 150, 'errors': [], 'started_at': '2026-05-23T14:38:20.061657+00:00', 'duration_seconds': 1.32, 'finished_at': '2026-05-23T14:38:21.379144+00:00'}]}
+[2026-05-23T14:38:21.452+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-05-23T14:38:21.471+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=01_metadata_driven_batch_ingestion, task_id=ingest_api_sources, run_id=manual__2026-05-23T14:37:42+00:00, execution_date=20260523T143742, start_date=20260523T143744, end_date=20260523T143821
+[2026-05-23T14:38:21.509+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 0
+[2026-05-23T14:38:21.529+0000] {taskinstance.py:3498} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-05-23T14:38:21.531+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

@@ -164,5 +164,5 @@ and dynamically routes each source to the appropriate ingestion handler.
         doc_md="Log overall ingestion summary from all sources",
     )
 
-    # Parallel ingestion, then summary
-    start >> [kaggle_task, file_task, api_task] >> summary_task >> end
+    # Sequential ingestion to avoid DuckDB write lock conflicts
+    start >> kaggle_task >> file_task >> api_task >> summary_task >> end

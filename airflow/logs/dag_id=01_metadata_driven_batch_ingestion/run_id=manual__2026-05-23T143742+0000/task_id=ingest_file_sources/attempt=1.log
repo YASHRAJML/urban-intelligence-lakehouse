@@ -1,0 +1,45 @@
+[2026-05-23T14:37:44.419+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-05-23T14:37:44.454+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 01_metadata_driven_batch_ingestion.ingest_file_sources manual__2026-05-23T14:37:42+00:00 [queued]>
+[2026-05-23T14:37:44.461+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 01_metadata_driven_batch_ingestion.ingest_file_sources manual__2026-05-23T14:37:42+00:00 [queued]>
+[2026-05-23T14:37:44.461+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 4
+[2026-05-23T14:37:44.471+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): ingest_file_sources> on 2026-05-23 14:37:42+00:00
+[2026-05-23T14:37:44.478+0000] {standard_task_runner.py:63} INFO - Started process 3976 to run task
+[2026-05-23T14:37:44.482+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', '01_metadata_driven_batch_ingestion', 'ingest_file_sources', 'manual__2026-05-23T14:37:42+00:00', '--job-id', '33', '--raw', '--subdir', 'DAGS_FOLDER/dag_01_batch_ingestion.py', '--cfg-path', '/tmp/tmp2xkoag70']
+[2026-05-23T14:37:44.484+0000] {standard_task_runner.py:91} INFO - Job 33: Subtask ingest_file_sources
+[2026-05-23T14:37:44.549+0000] {task_command.py:426} INFO - Running <TaskInstance: 01_metadata_driven_batch_ingestion.ingest_file_sources manual__2026-05-23T14:37:42+00:00 [running]> on host 8ea7e69b3fbf
+[2026-05-23T14:37:44.627+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data-engineering' AIRFLOW_CTX_DAG_ID='01_metadata_driven_batch_ingestion' AIRFLOW_CTX_TASK_ID='ingest_file_sources' AIRFLOW_CTX_EXECUTION_DATE='2026-05-23T14:37:42+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-05-23T14:37:42+00:00'
+[2026-05-23T14:37:44.629+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-05-23T14:38:19.557+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: air_quality from air_quality.yaml
+[2026-05-23T14:38:19.564+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: city_demographics from city_demographics.yaml
+[2026-05-23T14:38:19.574+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: open_weather_api from open_weather_api.yaml
+[2026-05-23T14:38:19.582+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: public_transit_api from public_transit_api.yaml
+[2026-05-23T14:38:19.598+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: urban_events_kafka from urban_events_kafka.yaml
+[2026-05-23T14:38:19.607+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded source config: urban_traffic from urban_traffic.yaml
+[2026-05-23T14:38:19.607+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Loaded 6 enabled source configurations
+[2026-05-23T14:38:19.608+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | INFO     | ingestion_engine.engine | Starting ingestion | source_id=city_demographics | type=file | handler=FileIngestionSource
+[2026-05-23T14:38:19.625+0000] {logging_mixin.py:188} INFO - 2026-05-23 14:38:19 | ERROR    | ingestion_engine.engine | Ingestion failed for city_demographics: IO Error: Could not set lock on file "/opt/***/data/duckdb/urban_intelligence.duckdb": Conflicting lock is held in /usr/local/bin/python3.11 (PID 3978). See also https://duckdb.org/docs/stable/connect/concurrency
+Traceback (most recent call last):
+  File "/opt/***/ingestion_engine/engine.py", line 125, in run_by_type
+    result = self._execute_ingestion(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/***/ingestion_engine/engine.py", line 176, in _execute_ingestion
+    handler = handler_class(config=config, db_manager=self.db_manager)
+                                                      ^^^^^^^^^^^^^^^
+  File "/opt/***/ingestion_engine/engine.py", line 109, in db_manager
+    self._db_manager = DuckDBManager(self.db_path)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/***/ingestion_engine/utils/db_manager.py", line 51, in __init__
+    self._init_schemas()
+  File "/opt/***/ingestion_engine/utils/db_manager.py", line 65, in _init_schemas
+    with self._get_connection() as conn:
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/***/ingestion_engine/utils/db_manager.py", line 61, in _get_connection
+    return duckdb.connect(self.db_path)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/opt/***/data/duckdb/urban_intelligence.duckdb": Conflicting lock is held in /usr/local/bin/python3.11 (PID 3978). See also https://duckdb.org/docs/stable/connect/concurrency
+[2026-05-23T14:38:19.641+0000] {python.py:237} INFO - Done. Returned value was: {'ingested': 1, 'results': [{'source_id': 'city_demographics', 'status': 'failed', 'error': 'IO Error: Could not set lock on file "/opt/***/data/duckdb/urban_intelligence.duckdb": Conflicting lock is held in /usr/local/bin/python3.11 (PID 3978). See also https://duckdb.org/docs/stable/connect/concurrency'}]}
+[2026-05-23T14:38:19.642+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-05-23T14:38:19.663+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=01_metadata_driven_batch_ingestion, task_id=ingest_file_sources, run_id=manual__2026-05-23T14:37:42+00:00, execution_date=20260523T143742, start_date=20260523T143744, end_date=20260523T143819
+[2026-05-23T14:38:19.710+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 0
+[2026-05-23T14:38:19.734+0000] {taskinstance.py:3498} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-05-23T14:38:19.736+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

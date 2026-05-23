@@ -1,0 +1,18 @@
+[2026-05-23T14:23:34.610+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-05-23T14:23:34.811+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 04_silver_to_gold_transformation.build_dim_date scheduled__2026-05-23T13:00:00+00:00 [queued]>
+[2026-05-23T14:23:34.857+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 04_silver_to_gold_transformation.build_dim_date scheduled__2026-05-23T13:00:00+00:00 [queued]>
+[2026-05-23T14:23:34.862+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 3
+[2026-05-23T14:23:34.915+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): build_dim_date> on 2026-05-23 13:00:00+00:00
+[2026-05-23T14:23:34.940+0000] {standard_task_runner.py:63} INFO - Started process 225 to run task
+[2026-05-23T14:23:34.958+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', '04_silver_to_gold_transformation', 'build_dim_date', 'scheduled__2026-05-23T13:00:00+00:00', '--job-id', '3', '--raw', '--subdir', 'DAGS_FOLDER/dag_04_silver_to_gold.py', '--cfg-path', '/tmp/tmphgasm_ap']
+[2026-05-23T14:23:34.979+0000] {standard_task_runner.py:91} INFO - Job 3: Subtask build_dim_date
+[2026-05-23T14:23:35.234+0000] {task_command.py:426} INFO - Running <TaskInstance: 04_silver_to_gold_transformation.build_dim_date scheduled__2026-05-23T13:00:00+00:00 [running]> on host 8ea7e69b3fbf
+[2026-05-23T14:23:35.696+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data-engineering' AIRFLOW_CTX_DAG_ID='04_silver_to_gold_transformation' AIRFLOW_CTX_TASK_ID='build_dim_date' AIRFLOW_CTX_EXECUTION_DATE='2026-05-23T13:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-05-23T13:00:00+00:00'
+[2026-05-23T14:23:35.698+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-05-23T14:24:52.913+0000] {logging_mixin.py:188} INFO - ✅ dim_date: 2557 rows
+[2026-05-23T14:24:53.027+0000] {python.py:237} INFO - Done. Returned value was: 2557
+[2026-05-23T14:24:53.031+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-05-23T14:24:53.103+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=04_silver_to_gold_transformation, task_id=build_dim_date, run_id=scheduled__2026-05-23T13:00:00+00:00, execution_date=20260523T130000, start_date=20260523T142334, end_date=20260523T142453
+[2026-05-23T14:24:53.175+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 0
+[2026-05-23T14:24:53.223+0000] {taskinstance.py:3498} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-05-23T14:24:53.227+0000] {local_task_job_runner.py:222} INFO - ::endgroup::
